@@ -1,0 +1,917 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-07-06",
+  "total_entries": 68,
+  "categories": {
+    "im": "Instant Messaging",
+    "office": "Office & Productivity",
+    "browser": "Web Browsers",
+    "development": "Development Tools",
+    "design": "Design & Creative",
+    "game": "Gaming Platforms",
+    "cloud": "Cloud Storage & Sync",
+    "ai": "AI Tools",
+    "media": "Media & Entertainment",
+    "tool": "System Utilities",
+    "security": "Security Software",
+    "other": "Other"
+  },
+  "software": [
+    {
+      "name": "WeChat",
+      "category": "im",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Tencent\\WeChat\\*\\FileStorage\\File\\*",
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Image\\*",
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Video\\*",
+        "*\\Tencent\\WeChat\\*\\FileStorage\\MsgAttach\\*"
+      ],
+      "green_paths": [
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Cache\\*",
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Temp\\*",
+        "*\\Tencent\\WeChat\\*\\log\\*"
+      ],
+      "notes": "Files/images/videos are yellow (require confirmation); cache and logs are green (safe)"
+    },
+    {
+      "name": "WeChat Cache",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Cache\\*",
+        "*\\Tencent\\WeChat\\*\\FileStorage\\Temp\\*",
+        "*\\Tencent\\WeChat\\*\\log\\*",
+        "*\\Tencent\\WeChat\\Crashpad\\*"
+      ]
+    },
+    {
+      "name": "Tencent QQ",
+      "category": "im",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Tencent\\QQ*\\*\\FileRecv\\*",
+        "*\\Tencent\\QQ*\\*\\Image\\*",
+        "*\\Tencent\\QQ*\\*\\Video\\*"
+      ],
+      "green_paths": [
+        "*\\Tencent\\QQ*\\*\\ptb_cache\\*",
+        "*\\Tencent\\QQ*\\*\\log\\*",
+        "*\\Tencent\\QQ*\\temp\\*"
+      ]
+    },
+    {
+      "name": "Tencent QQ Cache",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Tencent\\QQ*\\*\\ptb_cache\\*",
+        "*\\Tencent\\QQ*\\*\\log\\*",
+        "*\\Tencent\\QQ*\\temp\\*",
+        "*\\Tencent\\QQ*\\Crashpad\\*"
+      ]
+    },
+    {
+      "name": "DingTalk",
+      "category": "im",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\DingTalk\\*\\*\\*"
+      ],
+      "green_paths": [
+        "*\\DingTalk\\*\\Cache\\*",
+        "*\\DingTalk\\*\\Logs\\*",
+        "*\\DingTalk\\*\\temp\\*"
+      ]
+    },
+    {
+      "name": "DingTalk Cache",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\DingTalk\\*\\Cache\\*",
+        "*\\DingTalk\\*\\Logs\\*",
+        "*\\DingTalk\\*\\temp\\*",
+        "*\\DingTalk\\*\\Crashpad\\*"
+      ]
+    },
+    {
+      "name": "Feishu / Lark",
+      "category": "im",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Feishu\\*\\files\\*",
+        "*\\Lark\\*\\files\\*",
+        "*\\Feishu\\*\\storage\\*",
+        "*\\Lark\\*\\storage\\*"
+      ],
+      "green_paths": [
+        "*\\Feishu\\*\\Cache\\*",
+        "*\\Feishu\\*\\Logs\\*",
+        "*\\Lark\\*\\Cache\\*",
+        "*\\Lark\\*\\Logs\\*"
+      ]
+    },
+    {
+      "name": "Feishu / Lark Cache",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Feishu\\*\\Cache\\*",
+        "*\\Feishu\\*\\Logs\\*",
+        "*\\Feishu\\*\\Code Cache\\*",
+        "*\\Lark\\*\\Cache\\*",
+        "*\\Lark\\*\\Logs\\*",
+        "*\\Lark\\*\\Code Cache\\*"
+      ]
+    },
+    {
+      "name": "Slack",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Slack\\Cache\\*",
+        "*\\Slack\\Code Cache\\*",
+        "*\\Slack\\GPUCache\\*",
+        "*\\Slack\\logs\\*",
+        "*\\Slack\\Service Worker\\*"
+      ]
+    },
+    {
+      "name": "Telegram",
+      "category": "im",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Telegram Desktop\\tdata\\*"
+      ],
+      "green_paths": [
+        "*\\Telegram Desktop\\tdata\\user_data*\\cache\\*",
+        "*\\Telegram Desktop\\tdata\\Dumps\\*"
+      ]
+    },
+    {
+      "name": "Telegram Cache",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Telegram Desktop\\tdata\\user_data*\\cache\\*",
+        "*\\Telegram Desktop\\tdata\\Dumps\\*"
+      ]
+    },
+    {
+      "name": "Discord",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Discord\\Cache\\*",
+        "*\\Discord\\Code Cache\\*",
+        "*\\Discord\\GPUCache\\*",
+        "*\\Discord\\logs\\*",
+        "*\\Discord\\Service Worker\\*"
+      ]
+    },
+    {
+      "name": "Microsoft Teams",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\Teams\\Cache\\*",
+        "*\\Microsoft\\Teams\\Code Cache\\*",
+        "*\\Microsoft\\Teams\\GPUCache\\*",
+        "*\\Microsoft\\Teams\\logs\\*",
+        "*\\Microsoft\\Teams\\tmp\\*"
+      ]
+    },
+    {
+      "name": "Zoom",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Zoom\\data\\*",
+        "*\\Zoom\\logs\\*"
+      ]
+    },
+    {
+      "name": "Skype",
+      "category": "im",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\Skype*\\Cache\\*",
+        "*\\Microsoft\\Skype*\\Logs\\*",
+        "*\\Skype\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Google Chrome",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Google\\Chrome\\User Data\\*\\Cache\\*",
+        "*\\Google\\Chrome\\User Data\\*\\Code Cache\\*",
+        "*\\Google\\Chrome\\User Data\\*\\GPUCache\\*",
+        "*\\Google\\Chrome\\User Data\\*\\Service Worker\\*",
+        "*\\Google\\Chrome\\User Data\\*\\DawnCache\\*",
+        "*\\Google\\Chrome\\User Data\\*\\BrowserMetrics\\*",
+        "*\\Google\\Chrome\\User Data\\GrShaderCache\\*",
+        "*\\Google\\Chrome\\User Data\\ShaderCache\\*"
+      ]
+    },
+    {
+      "name": "Microsoft Edge",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\Edge\\User Data\\*\\Cache\\*",
+        "*\\Microsoft\\Edge\\User Data\\*\\Code Cache\\*",
+        "*\\Microsoft\\Edge\\User Data\\*\\GPUCache\\*",
+        "*\\Microsoft\\Edge\\User Data\\*\\Service Worker\\*",
+        "*\\Microsoft\\Edge\\User Data\\*\\DawnCache\\*",
+        "*\\Microsoft\\Edge\\User Data\\GrShaderCache\\*",
+        "*\\Microsoft\\Edge\\User Data\\ShaderCache\\*"
+      ]
+    },
+    {
+      "name": "Mozilla Firefox",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Mozilla\\Firefox\\Profiles\\*\\cache2\\*",
+        "*\\Mozilla\\Firefox\\Profiles\\*\\thumbnails\\*",
+        "*\\Mozilla\\Firefox\\Profiles\\*\\startupCache\\*",
+        "*\\Mozilla\\Firefox\\Profiles\\*\\safebrowsing\\*",
+        "*\\Mozilla\\Firefox\\Crash Reports\\*"
+      ]
+    },
+    {
+      "name": "Brave Browser",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\BraveSoftware\\Brave-Browser\\User Data\\*\\Cache\\*",
+        "*\\BraveSoftware\\Brave-Browser\\User Data\\*\\Code Cache\\*",
+        "*\\BraveSoftware\\Brave-Browser\\User Data\\*\\GPUCache\\*"
+      ]
+    },
+    {
+      "name": "Opera Browser",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Opera Software\\Opera Stable\\Cache\\*",
+        "*\\Opera Software\\Opera Stable\\Code Cache\\*",
+        "*\\Opera Software\\Opera Stable\\GPUCache\\*"
+      ]
+    },
+    {
+      "name": "Vivaldi Browser",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Vivaldi\\User Data\\*\\Cache\\*",
+        "*\\Vivaldi\\User Data\\*\\Code Cache\\*",
+        "*\\Vivaldi\\User Data\\*\\GPUCache\\*"
+      ]
+    },
+    {
+      "name": "Arc Browser",
+      "category": "browser",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Arc\\User Data\\*\\Cache\\*",
+        "*\\Arc\\User Data\\*\\Code Cache\\*",
+        "*\\Arc\\User Data\\*\\GPUCache\\*"
+      ]
+    },
+    {
+      "name": "Microsoft Office",
+      "category": "office",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\Office\\*\\OfficeFileCache\\*",
+        "*\\Microsoft\\Office\\*\\Backstage\\*"
+      ]
+    },
+    {
+      "name": "WPS Office",
+      "category": "office",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Kingsoft\\WPS*\\*\\backup\\*",
+        "*\\Kingsoft\\WPS*\\*\\temp\\*",
+        "*\\Kingsoft\\WPS*\\*\\cache\\*"
+      ]
+    },
+    {
+      "name": "WPS Office Cache",
+      "category": "office",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Kingsoft\\WPS*\\*\\log\\*",
+        "*\\Kingsoft\\WPS*\\*\\crash\\*"
+      ]
+    },
+    {
+      "name": "Notion",
+      "category": "office",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Notion\\Cache\\*",
+        "*\\Notion\\Code Cache\\*",
+        "*\\Notion\\GPUCache\\*",
+        "*\\Notion\\logs\\*"
+      ]
+    },
+    {
+      "name": "Evernote",
+      "category": "office",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Evernote\\Cache\\*",
+        "*\\Evernote\\Logs\\*",
+        "*\\Evernote\\Crashpad\\*"
+      ]
+    },
+    {
+      "name": "Visual Studio Code",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Code\\Cache\\*",
+        "*\\Code\\CachedData\\*",
+        "*\\Code\\CachedExtensionVSIXs\\*",
+        "*\\Code\\Code Cache\\*",
+        "*\\Code\\GPUCache\\*",
+        "*\\Code\\logs\\*",
+        "*\\Code\\Service Worker\\*"
+      ]
+    },
+    {
+      "name": "Visual Studio",
+      "category": "development",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Microsoft\\VisualStudio\\*\\*"
+      ],
+      "green_paths": [
+        "*\\Microsoft\\VisualStudio\\*\\ComponentModelCache\\*",
+        "*\\VisualStudio\\Scratch\\*",
+        "*\\Microsoft\\VisualStudio\\*\\Designer\\ShadowCache\\*",
+        "*\\Microsoft\\VisualStudio\\*\\ImageLibrary\\ImageCache\\*"
+      ]
+    },
+    {
+      "name": "Visual Studio Cache",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\VisualStudio\\*\\ComponentModelCache\\*",
+        "*\\VisualStudio\\Scratch\\*",
+        "*\\Microsoft\\VisualStudio\\*\\Designer\\ShadowCache\\*",
+        "*\\Microsoft\\VisualStudio\\*\\ImageLibrary\\ImageCache\\*"
+      ]
+    },
+    {
+      "name": "JetBrains IDE (IntelliJ/PyCharm/WebStorm/etc)",
+      "category": "development",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\JetBrains\\*\\*\\*"
+      ],
+      "green_paths": [
+        "*\\JetBrains\\*\\*\\caches\\*",
+        "*\\JetBrains\\*\\*\\log\\*",
+        "*\\JetBrains\\*\\*\\tmp\\*",
+        "*\\JetBrains\\*\\*\\index\\*"
+      ]
+    },
+    {
+      "name": "JetBrains IDE Cache",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\JetBrains\\*\\*\\caches\\*",
+        "*\\JetBrains\\*\\*\\log\\*",
+        "*\\JetBrains\\*\\*\\tmp\\*",
+        "*\\JetBrains\\*\\*\\index\\*",
+        "*\\JetBrains\\*\\*\\workspace\\*"
+      ]
+    },
+    {
+      "name": "Node.js / npm",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\npm-cache\\*",
+        "*\\npm\\_cacache\\*",
+        "*\\node_modules\\.cache\\*"
+      ]
+    },
+    {
+      "name": "Python / pip",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\pip\\Cache\\*",
+        "*\\Python*\\__pycache__\\*",
+        "*\\.pyenv\\cache\\*",
+        "*\\.virtualenvs\\*\\__pycache__\\*"
+      ]
+    },
+    {
+      "name": "Docker Desktop",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Docker\\tmp\\*",
+        "*\\Docker\\logs\\*",
+        "*\\Docker Desktop\\*\\*"
+      ]
+    },
+    {
+      "name": "Git",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\.git\\objects\\pack\\tmp_*",
+        "*\\.git\\lfs\\tmp\\*",
+        "*\\.git\\index.lock"
+      ]
+    },
+    {
+      "name": "Android Studio",
+      "category": "development",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\AndroidStudio*\\*\\*"
+      ],
+      "green_paths": [
+        "*\\Android\\*\\cache\\*",
+        "*\\Android\\*\\tmp\\*",
+        "*\\Android\\*\\logs\\*",
+        "*\\Android\\avd\\*.avd\\cache.img*",
+        "*\\.gradle\\caches\\*",
+        "*\\.gradle\\wrapper\\dists\\*"
+      ]
+    },
+    {
+      "name": "Android SDK/Gradle Cache",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Android\\*\\cache\\*",
+        "*\\Android\\*\\tmp\\*",
+        "*\\Android\\*\\logs\\*",
+        "*\\Android\\avd\\*.avd\\cache.img*",
+        "*\\.gradle\\caches\\*",
+        "*\\.gradle\\wrapper\\dists\\*",
+        "*\\.gradle\\daemon\\*\\*"
+      ]
+    },
+    {
+      "name": "Unity",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Unity\\*\\Cache\\*",
+        "*\\Unity\\*\\Library\\ShaderCache\\*",
+        "*\\Unity\\*\\Library\\Bee\\*",
+        "*\\Unity\\Editor\\*\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Unreal Engine",
+      "category": "development",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Unreal Engine\\*\\DerivedDataCache\\*",
+        "*\\Unreal Engine\\*\\Intermediate\\*"
+      ]
+    },
+    {
+      "name": "Unreal Engine Cache",
+      "category": "development",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Unreal Engine\\*\\DerivedDataCache\\*",
+        "*\\Unreal Engine\\*\\Intermediate\\Build\\*",
+        "*\\Unreal Engine\\*\\Saved\\Logs\\*",
+        "*\\Unreal Engine\\*\\Saved\\Crashes\\*"
+      ]
+    },
+    {
+      "name": "Adobe Creative Cloud",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Adobe\\*\\*Cache*\\*",
+        "*\\Adobe\\Common\\Media Cache\\*",
+        "*\\Adobe\\Common\\Media Cache Files\\*",
+        "*\\Adobe\\Common\\Peak Files\\*",
+        "*\\Adobe\\Logs\\*",
+        "*\\Adobe\\temp\\*"
+      ]
+    },
+    {
+      "name": "Adobe Photoshop",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Adobe\\Adobe Photoshop*\\*Cache*\\*",
+        "*\\Adobe\\Adobe Photoshop*\\Temp\\*",
+        "*\\Adobe\\Adobe Photoshop*\\Logs\\*"
+      ]
+    },
+    {
+      "name": "Adobe Premiere Pro",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Adobe\\Adobe Premiere Pro*\\*Cache*\\*",
+        "*\\Adobe\\Common\\Media Cache\\*",
+        "*\\Adobe\\Common\\Media Cache Files\\*",
+        "*\\Adobe\\Common\\Peak Files\\*"
+      ]
+    },
+    {
+      "name": "Adobe After Effects",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Adobe\\Adobe After Effects*\\*Cache*\\*",
+        "*\\Adobe\\Adobe After Effects*\\Disk Cache\\*"
+      ]
+    },
+    {
+      "name": "Figma",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Figma\\Cache\\*",
+        "*\\Figma\\Code Cache\\*",
+        "*\\Figma\\GPUCache\\*",
+        "*\\Figma\\logs\\*",
+        "*\\Figma\\Service Worker\\*"
+      ]
+    },
+    {
+      "name": "Blender",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Blender Foundation\\Blender\\*\\cache\\*",
+        "*\\Blender Foundation\\Blender\\*\\tmp\\*"
+      ]
+    },
+    {
+      "name": "AutoCAD",
+      "category": "design",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Autodesk\\AutoCAD*\\*\\*"
+      ],
+      "green_paths": [
+        "*\\Autodesk\\AutoCAD*\\*\\PlotSpooler\\*",
+        "*\\Autodesk\\AutoCAD*\\*\\temp\\*"
+      ]
+    },
+    {
+      "name": "DaVinci Resolve",
+      "category": "design",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Blackmagic Design\\DaVinci Resolve\\CacheClip\\*",
+        "*\\Blackmagic Design\\DaVinci Resolve\\Proxy\\*",
+        "*\\Blackmagic Design\\DaVinci Resolve\\.gallery\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Steam",
+      "category": "game",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Steam\\steamapps\\common\\*",
+        "*\\Steam\\steamapps\\workshop\\*"
+      ],
+      "green_paths": [
+        "*\\Steam\\appcache\\*",
+        "*\\Steam\\Steam\\Cache\\*",
+        "*\\Steam\\logs\\*",
+        "*\\Steam\\dumps\\*",
+        "*\\Steam\\steamapps\\downloading\\*",
+        "*\\Steam\\steamapps\\temp\\*",
+        "*\\Steam\\steamapps\\shadercache\\*"
+      ]
+    },
+    {
+      "name": "Steam Cache",
+      "category": "game",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Steam\\appcache\\*",
+        "*\\Steam\\Steam\\Cache\\*",
+        "*\\Steam\\logs\\*",
+        "*\\Steam\\dumps\\*",
+        "*\\Steam\\steamapps\\downloading\\*",
+        "*\\Steam\\steamapps\\temp\\*",
+        "*\\Steam\\steamapps\\shadercache\\*"
+      ]
+    },
+    {
+      "name": "Epic Games",
+      "category": "game",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Epic Games\\Epic Games Launcher\\*\\Cache\\*",
+        "*\\Epic Games\\Epic Games Launcher\\*\\webcache\\*",
+        "*\\Epic Games\\Epic Games Launcher\\*\\Logs\\*"
+      ]
+    },
+    {
+      "name": "WeGame / Tencent Games",
+      "category": "game",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\Tencent\\WeGame\\*\\*"
+      ],
+      "green_paths": [
+        "*\\Tencent\\WeGame\\*\\log\\*",
+        "*\\Tencent\\WeGame\\*\\cache\\*"
+      ]
+    },
+    {
+      "name": "miHoYo / HoYoPlay",
+      "category": "game",
+      "safety_level": "yellow",
+      "path_patterns": [
+        "*\\HoYoPlay\\*\\*",
+        "*\\miHoYo*\\*\\*"
+      ],
+      "green_paths": [
+        "*\\HoYoPlay\\*\\webcache\\*",
+        "*\\miHoYo*\\*\\CrashSight\\Log\\*",
+        "*\\miHoYo*\\*\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Baidu Netdisk",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Baidu\\BaiduNetdisk\\*\\*cache*\\*",
+        "*\\Baidu\\BaiduNetdisk\\*\\Log\\*",
+        "*\\Baidu\\BaiduNetdisk\\*\\tmp\\*",
+        "*\\BaiduNetdisk\\*\\Cache\\*",
+        "*\\BaiduNetdisk\\*\\logs\\*"
+      ]
+    },
+    {
+      "name": "OneDrive",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\OneDrive\\*\\logs\\*",
+        "*\\OneDrive\\logs\\*"
+      ]
+    },
+    {
+      "name": "Google Drive",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Google\\DriveFS\\*\\logs\\*",
+        "*\\Google\\DriveFS\\*\\content_cache\\*"
+      ]
+    },
+    {
+      "name": "Dropbox",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Dropbox\\*\\cache\\*",
+        "*\\Dropbox\\*\\logs\\*",
+        "*\\Dropbox\\.dropbox.cache\\*"
+      ]
+    },
+    {
+      "name": "Aliyun Drive / aDrive",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\aDrive\\*\\Cache\\*",
+        "*\\aDrive\\*\\Logs\\*",
+        "*\\aDrive\\*\\temp\\*"
+      ]
+    },
+    {
+      "name": "Quark Cloud",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\QuarkCloud\\*\\Cache\\*",
+        "*\\QuarkCloud\\*\\Logs\\*",
+        "*\\QuarkCloud\\*\\temp\\*"
+      ]
+    },
+    {
+      "name": "123Pan Cloud",
+      "category": "cloud",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\123pan\\*\\cache\\*",
+        "*\\123pan\\*\\logs\\*",
+        "*\\123Pan\\*\\cache\\*"
+      ]
+    },
+    {
+      "name": "Cursor",
+      "category": "ai",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Cursor\\Cache\\*",
+        "*\\Cursor\\Code Cache\\*",
+        "*\\Cursor\\GPUCache\\*",
+        "*\\Cursor\\logs\\*",
+        "*\\Cursor\\Service Worker\\*",
+        "*\\Cursor\\blob_storage\\*",
+        "*\\Cursor\\WebStorage\\*"
+      ]
+    },
+    {
+      "name": "GitHub Copilot",
+      "category": "ai",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\GitHub Copilot\\*\\Cache\\*",
+        "*\\GitHub Copilot\\*\\Logs\\*"
+      ]
+    },
+    {
+      "name": "ChatGPT",
+      "category": "ai",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\ChatGPT\\Cache\\*",
+        "*\\ChatGPT\\Code Cache\\*",
+        "*\\ChatGPT\\GPUCache\\*",
+        "*\\OpenAI\\ChatGPT\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Trae / Windsurf / Claude",
+      "category": "ai",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Trae\\*\\Cache\\*",
+        "*\\Trae\\*\\Code Cache\\*",
+        "*\\Windsurf\\*\\Cache\\*",
+        "*\\CodeBuddy CN\\*\\Cache\\*",
+        "*\\Claude\\Cache\\*"
+      ]
+    },
+    {
+      "name": "NetEase Cloud Music",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Netease\\CloudMusic\\*\\Cache\\*",
+        "*\\Netease\\CloudMusic\\*\\webcache\\*",
+        "*\\Netease\\CloudMusic\\*\\Logs\\*"
+      ]
+    },
+    {
+      "name": "QQ Music",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Tencent\\QQMusic\\Cache\\*",
+        "*\\Tencent\\QQMusic\\Logs\\*",
+        "*\\QQMusic\\Cache\\*"
+      ]
+    },
+    {
+      "name": "Kugou Music",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Kugou\\*\\Cache\\*",
+        "*\\Kugou\\*\\Log\\*",
+        "*\\Kugou\\*\\temp\\*"
+      ]
+    },
+    {
+      "name": "Spotify",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Spotify\\*\\Cache\\*",
+        "*\\Spotify\\*\\Data\\*",
+        "*\\Spotify\\Browser\\*"
+      ]
+    },
+    {
+      "name": "VLC Media Player",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\vlc\\art\\*",
+        "*\\vlc\\cache\\*"
+      ]
+    },
+    {
+      "name": "PotPlayer",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\PotPlayer*\\Capture\\*",
+        "*\\PotPlayer*\\Log\\*"
+      ]
+    },
+    {
+      "name": "Bilibili",
+      "category": "media",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Bilibili\\*\\Cache\\*",
+        "*\\Bilibili\\*\\Logs\\*",
+        "*\\bilibili\\Cache\\*"
+      ]
+    },
+    {
+      "name": "7-Zip",
+      "category": "tool",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\7-Zip\\*.tmp",
+        "*\\7-Zip\\temp\\*"
+      ]
+    },
+    {
+      "name": "WinRAR",
+      "category": "tool",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\WinRAR\\*.tmp",
+        "*\\WinRAR\\temp\\*"
+      ]
+    },
+    {
+      "name": "Everything",
+      "category": "tool",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Everything\\*.db.tmp",
+        "*\\Everything\\Logs\\*"
+      ]
+    },
+    {
+      "name": "Windows Thumbnail Cache",
+      "category": "system",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\Microsoft\\Windows\\Explorer\\thumbcache_*.db",
+        "*\\Microsoft\\Windows\\Explorer\\iconcache_*.db"
+      ]
+    },
+    {
+      "name": "Windows Temp Files",
+      "category": "system",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\AppData\\Local\\Temp\\*",
+        "*\\AppData\\Local\\Microsoft\\Windows\\Temporary Internet Files\\*",
+        "*\\AppData\\Local\\Microsoft\\Windows\\INetCache\\*",
+        "*\\AppData\\Local\\Microsoft\\Windows\\WER\\*",
+        "*\\AppData\\Local\\Microsoft\\Windows\\Caches\\*"
+      ]
+    },
+    {
+      "name": "Windows Delivery Optimization",
+      "category": "system",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\SoftwareDistribution\\Download\\*",
+        "*\\DeliveryOptimization\\Cache\\*"
+      ]
+    },
+    {
+      "name": "NVIDIA DXCache/GLcache",
+      "category": "system",
+      "safety_level": "green",
+      "path_patterns": [
+        "*\\NVIDIA Corporation\\*Cache*\\*",
+        "*\\NVIDIA\\DXCache\\*",
+        "*\\NVIDIA\\GLCache\\*"
+      ]
+    },
+    {
+      "name": "System TEMP Files",
+      "category": "system",
+      "safety_level": "green",
+      "path_patterns": [
+        "$env:TEMP\\*",
+        "$env:TMP\\*",
+        "C:\\Windows\\Temp\\*"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "_comment": "C_Cleaner v2.0 — Edit this file to customize behavior.",
+  "target_drive": "D",
+  "min_file_age_days": 7,
+  "min_size_mb": 50,
+  "max_scan_depth": 2,
+  "excluded_paths": [],
+  "auto_confirm_green": true,
+  "preserve_junction_backup": true,
+  "robocopy_retry": 3,
+  "robocopy_wait": 2,
+  "sample_verification_count": 20,
+  "scan_downloads": true,
+  "scan_documents": false,
+  "scan_system_temp": true,
+  "scan_recycle_bin": false,
+  "log_retention_days": 30,
+  "backup_retention_days": 90,
+  "excluded_users": [
+    "Public",
+    "Default",
+    "Default User"
+  ],
+  "category_enabled": {
+    "im": true,
+    "office": true,
+    "browser": true,
+    "development": true,
+    "design": true,
+    "game": true,
+    "cloud": true,
+    "ai": true,
+    "media": true,
+    "tool": true,
+    "security": false,
+    "other": true
+  }
+}

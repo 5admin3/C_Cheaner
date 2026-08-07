@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C 盘清理中心</title>
+<style>
+:root {
+  --bg: #1e1e1e; --panel: #252526; --panel2: #2a2d2e; --border: #333;
+  --txt: #d4d4d4; --dim: #888; --blue: #569cd6; --green: #4ec9b0;
+  --yellow: #dcdcaa; --red: #f44747; --mono: Consolas, 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--txt); font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; font-size: 14px; }
+.hidden { display: none !important; }
+
+/* ---------- 顶栏 ---------- */
+header {
+  display: flex; align-items: center; gap: 14px; padding: 14px 22px;
+  background: var(--panel); border-bottom: 2px solid var(--blue);
+  position: sticky; top: 0; z-index: 50;
+}
+header h1 { font-size: 18px; color: var(--blue); letter-spacing: 1px; }
+header .sub { color: var(--dim); font-size: 12px; }
+header .spacer { flex: 1; }
+.badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 1px solid; }
+.badge.admin { color: var(--green); border-color: var(--green); }
+.badge.user  { color: var(--yellow); border-color: var(--yellow); }
+.badge.warn  { color: var(--red);    border-color: var(--red); }
+.btn {
+  background: #333; color: var(--txt); border: 1px solid #444; border-radius: 6px;
+  padding: 6px 14px; font-size: 13px; cursor: pointer; transition: .15s;
+}
+.btn:hover { background: #3c3f41; border-color: var(--blue); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary { background: #264f78; border-color: #1a6bb0; color: #fff; }
+.btn.primary:hover { background: #2f6f9f; }
+.btn.danger { background: #5a1d1d; border-color: #8b3a3a; color: #ffb4b4; }
+.btn.danger:hover { background: #7a2626; }
+.btn.sm { padding: 3px 10px; font-size: 12px; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); font-size: 12px; cursor: pointer; }
+
+/* ---------- 任务条 ---------- */
+#taskbar {
+  display: flex; align-items: center; gap: 10px; padding: 8px 22px;
+  background: #1b2a1b; border-bottom: 1px solid var(--green); color: var(--green); font-size: 13px;
+}
+#taskbar.error { background: #2a1b1b; color: var(--red); border-color: var(--red); }
+.spinner {
+  width: 14px; height: 14px; border: 2px solid var(--green); border-top-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- 主体 ---------- */
+main { padding: 20px 22px 60px; max-width: 1200px; margin: 0 auto; }
+
+/* 磁盘区 */
+.disk-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.disk-card {
+  flex: 1; min-width: 300px; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; display: flex; gap: 18px; align-items: center;
+}
+.ring {
+  width: 110px; height: 110px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.ring::after {
+  content: ''; position: absolute; width: 82px; height: 82px; border-radius: 50%; background: var(--panel);
+}
+.ring .pct { position: relative; z-index: 1; font-size: 22px; font-weight: 700; }
+.disk-info h3 { font-size: 15px; margin-bottom: 6px; }
+.disk-info .row { color: var(--dim); font-size: 12px; margin: 3px 0; }
+.disk-info .row b { color: var(--txt); font-family: var(--mono); }
+.drives-mini { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+.drives-mini .row { display: flex; gap: 8px; align-items: center; }
+.bar { flex: 1; height: 8px; background: #1a1a1a; border-radius: 4px; overflow: hidden; }
+.bar > div { height: 100%; border-radius: 4px; }
+
+/* 统计卡 */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+.stat {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+  cursor: pointer; transition: .15s; position: relative;
+}
+.stat:hover { border-color: var(--blue); transform: translateY(-2px); }
+.stat .label { color: var(--dim); font-size: 12px; margin-bottom: 4px; }
+.stat .value { font-size: 24px; font-weight: 700; font-family: var(--mono); }
+.stat .sub { color: var(--dim); font-size: 11px; margin-top: 3px; }
+.stat .tag { position: absolute; top: 10px; right: 12px; font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+.stat.g .value { color: var(--green); } .stat.g .tag { background: #16352e; color: var(--green); }
+.stat.y .value { color: var(--yellow); } .stat.y .tag { background: #35341c; color: var(--yellow); }
+.stat.r .value { color: var(--red); }    .stat.r .tag { background: #3a1c1c; color: var(--red); }
+.stat.b .value { color: var(--blue); }   .stat.b .tag { background: #1c2a3a; color: var(--blue); }
+
+/* 操作区 */
+.actions { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.actions .hint { color: var(--dim); font-size: 12px; align-self: center; }
+
+/* 标签页 */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tab {
+  padding: 9px 18px; cursor: pointer; color: var(--dim); border: 1px solid transparent;
+  border-bottom: none; border-radius: 8px 8px 0 0; font-size: 13px;
+}
+.tab:hover { color: var(--txt); }
+.tab.active { color: var(--blue); background: var(--panel); border-color: var(--border); border-bottom: 2px solid var(--blue); }
+.tab .cnt { font-family: var(--mono); font-size: 11px; margin-left: 5px; }
+
+/* 列表 */
+.list-head {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--panel2);
+  border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px;
+}
+.list-head .sel-info { color: var(--dim); font-size: 12px; }
+.item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px;
+  border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--panel);
+}
+.item:hover { border-color: #555; }
+.item .chk { margin-top: 2px; accent-color: var(--blue); }
+.item .body { flex: 1; min-width: 0; }
+.item .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.item .name { font-weight: 600; font-size: 14px; }
+.item .size { font-family: var(--mono); font-size: 13px; }
+.item .sz-g { color: var(--green); } .item .sz-y { color: var(--yellow); } .item .sz-r { color: var(--red); }
+.item .path { font-family: var(--mono); font-size: 11px; color: var(--dim); word-break: break-all; margin: 3px 0; }
+.item .meta { font-size: 11px; color: var(--dim); display: flex; gap: 12px; flex-wrap: wrap; }
+.item .reason { font-size: 12px; margin-top: 3px; }
+.lvl { font-size: 10px; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; font-weight: 600; }
+.lvl.green { background: #16352e; color: var(--green); }
+.lvl.yellow { background: #35341c; color: var(--yellow); }
+.lvl.red { background: #3a1c1c; color: var(--red); }
+.empty { color: var(--dim); text-align: center; padding: 40px 0; }
+.empty .big { font-size: 15px; margin-bottom: 6px; }
+
+/* 残留类型徽章 */
+.ttype { font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid; }
+.ttype.registry { color: #d7ba7d; border-color: #d7ba7d; }
+.ttype.folder { color: var(--yellow); border-color: var(--yellow); }
+.ttype.appdata { color: var(--blue); border-color: var(--blue); }
+.ttype.shortcut { color: var(--green); border-color: var(--green); }
+.ttype.system { color: #9cdcfe; border-color: #9cdcfe; }
+
+/* 备份表 */
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--panel2); color: var(--blue); padding: 9px 12px; text-align: left; font-size: 12px; }
+td { padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:hover td { background: var(--panel2); }
+td.path { font-family: var(--mono); font-size: 11px; color: var(--dim); word-break: break-all; max-width: 420px; }
+
+/* 日志 */
+#logbox {
+  background: #131313; border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; font-family: var(--mono); font-size: 11.5px; line-height: 1.7;
+  max-height: 460px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+}
+#logbox .INFO { color: #9cdcfe; } #logbox .WARN { color: var(--yellow); }
+#logbox .ERROR { color: var(--red); } #logbox .SUCCESS { color: var(--green); }
+
+/* 模态框 */
+#modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  width: 640px; max-width: 92vw; max-height: 80vh; display: flex; flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+}
+.modal h2 { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 16px; }
+.modal .mbody { padding: 14px 20px; overflow-y: auto; flex: 1; }
+.modal .mfoot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+.modal .warn-box { background: #2a1b1b; border: 1px solid #5a2525; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #ffb4b4; margin-bottom: 12px; }
+.modal .warn-box b { color: var(--red); }
+.modal ul { list-style: none; }
+.modal li { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; font-size: 12px; }
+.modal li .mpath { font-family: var(--mono); font-size: 11px; color: var(--dim); word-break: break-all; }
+.modal li .mname { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧹 C 盘清理中心</h1>
+  <span class="sub" id="ver">C Drive Cleaner</span>
+  <span class="badge admin hidden" id="badgeAdmin">管理员模式</span>
+  <span class="badge user hidden" id="badgeUser">普通模式 · 清理受限</span>
+  <div class="spacer"></div>
+  <label class="toggle"><input type="checkbox" id="autoRefresh" checked> 自动刷新 (5s)</label>
+  <button class="btn" id="btnRefresh" title="刷新磁盘信息">⟳ 刷新</button>
+</header>
+
+<div id="taskbar" class="hidden">
+  <div class="spinner"></div>
+  <span id="taskText">任务进行中…</span>
+</div>
+
+<main>
+  <!-- 磁盘 -->
+  <section class="disk-grid" id="diskGrid"></section>
+
+  <!-- 统计 -->
+  <section class="stats" id="statCards"></section>
+
+  <!-- 操作 -->
+  <section class="actions">
+    <button class="btn primary" id="btnScan">🔍 扫描可清理项目</button>
+    <button class="btn primary" id="btnResidue">🧹 扫描卸载残留</button>
+    <span class="hint" id="scanHint">扫描会遍历所有用户目录，需数十秒，请稍候</span>
+  </section>
+
+  <!-- 标签页 -->
+  <nav class="tabs" id="tabs">
+    <div class="tab active" data-tab="green">可安全清理 <span class="cnt" id="cntGreen">0</span></div>
+    <div class="tab" data-tab="yellow">需确认 <span class="cnt" id="cntYellow">0</span></div>
+    <div class="tab" data-tab="red">系统保护 <span class="cnt" id="cntRed">0</span></div>
+    <div class="tab" data-tab="residue">卸载残留 <span class="cnt" id="cntResidue">0</span></div>
+    <div class="tab" data-tab="backup">备份恢复</div>
+    <div class="tab" data-tab="log">运行日志</div>
+  </nav>
+
+  <section id="tab-green">
+    <div class="list-head">
+      <label class="toggle"><input type="checkbox" id="selAllGreen"> 全选</label>
+      <span class="sel-info" id="selInfoGreen"></span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn primary sm" id="btnCleanGreen">清理选中</button>
+    </div>
+    <div id="listGreen"></div>
+  </section>
+
+  <section id="tab-yellow" class="hidden">
+    <div class="list-head">
+      <label class="toggle"><input type="checkbox" id="selAllYellow"> 全选</label>
+      <span class="sel-info" id="selInfoYellow"></span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn primary sm" id="btnCleanYellow">清理选中（逐项确认）</button>
+    </div>
+    <div id="listYellow"></div>
+  </section>
+
+  <section id="tab-red" class="hidden">
+    <div class="empty">
+      <div class="big">🛡️ 以下项目受系统保护，工具永远不会触碰</div>
+      <div>红色级别包含系统文件、驱动、正在运行的软件等，仅供查看</div>
+    </div>
+    <div id="listRed"></div>
+  </section>
+
+  <section id="tab-residue" class="hidden">
+    <div class="list-head">
+      <span class="sel-info">软件卸载后遗留的注册表条目、孤儿目录、失效快捷方式与 AppData 残留数据</span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn primary sm" id="btnScanResidue">重新扫描</button>
+      <button class="btn danger sm" id="btnCleanResidue">清理选中</button>
+    </div>
+    <div id="listResidue"></div>
+  </section>
+
+  <section id="tab-backup" class="hidden">
+    <div class="list-head">
+      <span class="sel-info">清理前自动备份到 backups\，可随时一键恢复。删除操作完成后备份会自动移除</span>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn sm" id="btnRefreshBackups">刷新列表</button>
+    </div>
+    <div id="listBackups"></div>
+  </section>
+
+  <section id="tab-log" class="hidden">
+    <div id="logbox"></div>
+  </section>
+</main>
+
+<!-- 模态框 -->
+<div id="modal-backdrop" class="hidden">
+  <div class="modal">
+    <h2 id="modalTitle">确认清理</h2>
+    <div class="mbody">
+      <div class="warn-box" id="modalWarn"></div>
+      <ul id="modalList"></ul>
+    </div>
+    <div class="mfoot">
+      <button class="btn" id="modalCancel">取消</button>
+      <button class="btn danger" id="modalOk">确认清理</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ==================== 状态 ==================== */
+let scanData = null;      // 扫描结果
+let residueData = null;   // 残留扫描结果
+let activeTab = "green";
+let activeTask = null;    // {type, interval}
+const fmtMB = v => v >= 1024 ? (v/1024).toFixed(2) + " GB" : Math.round(v) + " MB";
+const fmtBytes = b => b >= 1024*1024*1024 ? (b/1024/1024/1024).toFixed(2)+" GB" : (b/1024/1024).toFixed(1)+" MB";
+
+/* ==================== 工具 ==================== */
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  return res.json();
+}
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function showTask(msg, isError) {
+  const tb = document.getElementById("taskbar");
+  tb.classList.remove("error");
+  if (isError) tb.classList.add("error");
+  tb.querySelector("span").textContent = msg;
+  tb.classList.remove("hidden");
+}
+function hideTask() {
+  const tb = document.getElementById("taskbar");
+  tb.classList.add("hidden");
+  tb.classList.remove("error");
+}
+
+/* 轮询任务直至完成 */
+function pollTask(type, onDone, onError) {
+  const iv = setInterval(async () => {
+    const st = await api("/api/task?type=" + type);
+    if (st.state === "running") {
+      showTask("后台任务进行中（" + type + "）… 开始时间 " + (st.started || ""));
+    } else if (st.state === "done") {
+      clearInterval(iv);
+      hideTask();
+      if (onDone) onDone(st.result);
+    } else if (st.state === "error") {
+      clearInterval(iv);
+      showTask("任务出错：" + (st.message || "未知错误"), true);
+      setTimeout(hideTask, 4000);
+      if (onError) onError(st);
+    } else {
+      clearInterval(iv);
+      hideTask();
+      if (onError) onError(st);
+    }
+  }, 1500);
+  showTask("后台任务进行中（" + type + "）…");
+}
+
+/* ==================== 磁盘 ==================== */
+async function loadDisk() {
+  const d = await api("/api/disk");
+  const grid = document.getElementById("diskGrid");
+  grid.innerHTML = "";
+  const drives = d.drives || [];
+  const c = drives.find(x => x.letter === "C") || drives[0];
+  if (c) {
+    const card = el("div", "disk-card");
+    const ring = el("div", "ring");
+    const p = c.usedPercent;
+    const col = p > 85 ? "var(--red)" : p > 70 ? "var(--yellow)" : "var(--green)";
+    ring.style.background = `conic-gradient(${col} ${p*3.6}deg, #1a1a1a 0deg)`;
+    ring.appendChild(el("div", "pct", p + "%"));
+    const info = el("div", "disk-info");
+    info.appendChild(el("h3", "", "C 盘"));
+    const r1 = el("div", "row"); r1.innerHTML = "已用 <b>" + c.usedGB + " GB</b>";
+    const r2 = el("div", "row"); r2.innerHTML = "可用 <b>" + c.freeGB + " GB</b>";
+    const r3 = el("div", "row"); r3.innerHTML = "总计 <b>" + c.totalGB + " GB</b>";
+    info.appendChild(r1); info.appendChild(r2); info.appendChild(r3);
+    card.appendChild(ring); card.appendChild(info);
+    grid.appendChild(card);
+  }
+  // 其他盘
+  const others = drives.filter(x => x.letter !== "C");
+  if (others.length) {
+    const card = el("div", "disk-card");
+    const info = el("div", "disk-info");
+    info.style.flex = "1";
+    info.appendChild(el("h3", "", "其他磁盘"));
+    const mini = el("div", "drives-mini");
+    for (const dr of others) {
+      const row = el("div", "row");
+      row.appendChild(el("span", "", dr.letter + ":"));
+      const bar = el("div", "bar");
+      const fill = el("div", "");
+      fill.style.width = dr.usedPercent + "%";
+      const col2 = dr.usedPercent > 85 ? "var(--red)" : dr.usedPercent > 70 ? "var(--yellow)" : "var(--green)";
+      fill.style.background = col2;
+      bar.appendChild(fill);
+      row.appendChild(bar);
+      row.appendChild(el("span", "", dr.usedPercent + "% · 剩 " + dr.freeGB + " GB"));
+      mini.appendChild(row);
+    }
+    info.appendChild(mini);
+    card.appendChild(info);
+    grid.appendChild(card);
+  }
+}
+
+/* ==================== 统计卡 ==================== */
+function renderStats() {
+  const s = document.getElementById("statCards");
+  s.innerHTML = "";
+  const cards = [];
+  if (scanData) {
+    const st = scanData.stats;
+    cards.push({ key: "g", label: "可安全清理（绿色）", value: st.cleanableGB + " GB", sub: "绿色 + 黄色，删除前自动备份", tag: st.green + " 项" });
+    cards.push({ key: "y", label: "需确认（黄色）", value: st.yellow + " 项", sub: "聊天记录 / 配置 / 下载等，自行判断", tag: (st.totalGB) + " GB" });
+    cards.push({ key: "r", label: "系统保护（红色）", value: st.red + " 项", sub: "系统文件 / 运行中软件，绝不触碰", tag: "永不操作" });
+  }
+  if (residueData) {
+    cards.push({ key: "b", label: "卸载残留", value: residueData.stats.total + " 项", sub: "注册表 / 孤儿目录 / 失效快捷方式 / 残留数据", tag: residueData.stats.totalMB + " MB" });
+  }
+  if (!cards.length) {
+    s.innerHTML = '<div class="empty" style="grid-column:1/-1">尚未扫描，点击上方按钮开始</div>';
+    return;
+  }
+  for (const c of cards) {
+    const st = el("div", "stat " + c.key);
+    st.appendChild(el("div", "label", c.label));
+    st.appendChild(el("div", "value", c.value));
+    st.appendChild(el("div", "sub", c.sub));
+    st.appendChild(el("span", "tag", c.tag));
+    st.onclick = () => switchTab(c.key === "g" ? "green" : c.key === "y" ? "yellow" : c.key === "r" ? "red" : "residue");
+    s.appendChild(st);
+  }
+}
+
+/* ==================== 扫描列表 ==================== */
+function itemRow(it, level, allowCheck) {
+  const div = el("div", "item");
+  if (allowCheck) {
+    const cb = el("input", "chk");
+    cb.type = "checkbox";
+    cb.dataset.path = it.path;
+    div.appendChild(cb);
+  }
+  const body = el("div", "body");
+  const top = el("div", "top");
+  top.appendChild(el("span", "lvl " + level, level.toUpperCase()));
+  top.appendChild(el("span", "name", it.name || (it.path.split("\\").pop())));
+  const szCls = level === "green" ? "sz-g" : level === "yellow" ? "sz-y" : "sz-r";
+  top.appendChild(el("span", "size " + szCls, fmtMB(it.sizeMB)));
+  body.appendChild(top);
+  body.appendChild(el("div", "path", it.path));
+  const meta = el("div", "meta");
+  if (it.user) meta.appendChild(el("span", "", "用户: " + it.user));
+  if (it.software) meta.appendChild(el("span", "", "软件: " + it.software));
+  if (it.fileCount != null) meta.appendChild(el("span", "", it.fileCount + " 个文件"));
+  if (it.lastModified) meta.appendChild(el("span", "", "修改: " + it.lastModified));
+  body.appendChild(meta);
+  if (it.reason) body.appendChild(el("div", "reason", "💡 " + it.reason));
+  div.appendChild(body);
+  return div;
+}
+
+function renderScanList(level, containerId, selectAllId, infoId, btnId, allowCheck) {
+  if (!scanData) {
+    document.getElementById(containerId).innerHTML = '<div class="empty"><div class="big">尚未扫描</div>点击上方「扫描可清理项目」开始</div>';
+    return;
+  }
+  const items = scanData.items.filter(x => x.level.toLowerCase() === level);
+  const box = document.getElementById(containerId);
+  box.innerHTML = "";
+  document.getElementById("cnt" + level[0].toUpperCase() + level.slice(1)).textContent = items.length;
+  if (!items.length) {
+    box.innerHTML = '<div class="empty"><div class="big">没有 ' + level + ' 级别项目</div></div>';
+    return;
+  }
+  for (const it of items) box.appendChild(itemRow(it, level, allowCheck));
+  if (allowCheck) bindSel(containerId, selectAllId, infoId, btnId, items);
+}
+
+function bindSel(containerId, selectAllId, infoId, btnId, items) {
+  const box = document.getElementById(containerId);
+  const selAll = document.getElementById(selectAllId);
+  const info = document.getElementById(infoId);
+  const btn = document.getElementById(btnId);
+  const update = () => {
+    const cbs = box.querySelectorAll("input.chk");
+    const picked = [...cbs].filter(c => c.checked);
+    const sz = picked.reduce((s, c) => {
+      const it = items.find(x => x.path === c.dataset.path);
+      return s + (it ? it.sizeBytes : 0);
+    }, 0);
+    info.textContent = picked.length ? "已选 " + picked.length + " 项 · " + fmtBytes(sz) : "";
+    selAll.checked = cbs.length > 0 && picked.length === cbs.length;
+    btn.disabled = picked.length === 0;
+  };
+  selAll.onchange = () => { box.querySelectorAll("input.chk").forEach(c => c.checked = selAll.checked); update(); };
+  box.addEventListener("change", update);
+  update();
+}
+
+/* ==================== 残留列表 ==================== */
+const TYPE_LABEL = { registry: "注册表", folder: "孤儿目录", shortcut: "快捷方式", appdata: "残留数据", system: "系统残留" };
+
+function renderResidue() {
+  const box = document.getElementById("listResidue");
+  box.innerHTML = "";
+  const cnt = document.getElementById("cntResidue");
+  if (!residueData) {
+    cnt.textContent = "0";
+    box.innerHTML = '<div class="empty"><div class="big">未扫描卸载残留</div>点击上方「扫描卸载残留」，检查卸载后遗留的注册表条目、孤儿目录、失效快捷方式与 AppData 残留</div>';
+    return;
+  }
+  const items = residueData.items || [];
+  cnt.textContent = items.length;
+  if (!items.length) {
+    box.innerHTML = '<div class="empty"><div class="big">✅ 未发现卸载残留</div>系统很干净</div>';
+    return;
+  }
+  for (const it of items) {
+    const div = el("div", "item");
+    const cb = el("input", "chk");
+    cb.type = "checkbox";
+    cb.dataset.id = it.id;
+    div.appendChild(cb);
+    const body = el("div", "body");
+    const top = el("div", "top");
+    top.appendChild(el("span", "lvl " + it.level.toLowerCase(), it.level.toUpperCase()));
+    top.appendChild(el("span", "ttype " + it.type, TYPE_LABEL[it.type] || it.type));
+    top.appendChild(el("span", "name", it.name));
+    top.appendChild(el("span", "size " + (it.level === "green" ? "sz-g" : "sz-y"), fmtMB(it.sizeMB)));
+    body.appendChild(top);
+    body.appendChild(el("div", "path", it.path));
+    const meta = el("div", "meta");
+    if (it.fileCount != null) meta.appendChild(el("span", "", it.fileCount + " 个文件"));
+    if (it.lastModified) meta.appendChild(el("span", "", "修改: " + it.lastModified));
+    body.appendChild(meta);
+    body.appendChild(el("div", "reason", "💡 " + it.reason));
+    if (it.detail) body.appendChild(el("div", "meta", it.detail));
+    div.appendChild(body);
+    box.appendChild(div);
+  }
+  // 选择逻辑
+  const cbs = box.querySelectorAll("input.chk");
+  const info = document.querySelector("#tab-residue .sel-info");
+  const btn = document.getElementById("btnCleanResidue");
+  const update = () => {
+    const picked = [...cbs].filter(c => c.checked).length;
+    btn.disabled = picked === 0;
+  };
+  box.addEventListener("change", update);
+  update();
+}
+
+/* ==================== 备份 ==================== */
+async function loadBackups() {
+  const d = await api("/api/backups");
+  const box = document.getElementById("listBackups");
+  box.innerHTML = "";
+  const bks = d.backups || [];
+  if (!bks.length) {
+    box.innerHTML = '<div class="empty"><div class="big">暂无备份</div>清理操作会自动生成备份，可在此恢复</div>';
+    return;
+  }
+  const tbl = document.createElement("table");
+  const thead = document.createElement("thead");
+  thead.innerHTML = "<tr><th>#</th><th>备份文件</th><th>原始路径</th><th>大小</th><th>创建时间</th><th>操作</th></tr>";
+  tbl.appendChild(thead);
+  bks.forEach((b, i) => {
+    const tr = document.createElement("tr");
+    const td1 = document.createElement("td"); td1.textContent = i + 1;
+    const td2 = document.createElement("td"); td2.textContent = b.name;
+    const td3 = document.createElement("td"); td3.className = "path";
+    td3.textContent = b.info && b.info.original ? b.info.original : "(未知)";
+    const td4 = document.createElement("td"); td4.textContent = b.sizeKB + " KB";
+    const td5 = document.createElement("td"); td5.textContent = b.created;
+    const td6 = document.createElement("td");
+    const rbtn = el("button", "btn danger sm", "恢复");
+    rbtn.onclick = () => restoreBackup(b.name);
+    td6.appendChild(rbtn);
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5); tr.appendChild(td6);
+    tbl.appendChild(tr);
+  });
+  box.appendChild(tbl);
+}
+
+function restoreBackup(name) {
+  showModal("恢复备份", "将把备份还原到原始位置，还原成功后备份文件会被移除。", [name], async () => {
+    await api("/api/restore", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    pollTask("restore", () => {
+      loadBackups();
+      showTask("✅ 恢复完成", false);
+      setTimeout(hideTask, 3000);
+    }, () => { loadBackups(); });
+  });
+}
+
+/* ==================== 日志 ==================== */
+async function loadLogs() {
+  const d = await api("/api/log");
+  const box = document.getElementById("logbox");
+  const lines = d.lines || [];
+  const html = lines.map(l => {
+    const m = l.match(/^(\[.*?\])\s*\[(\w+)\]\s*(.*)$/);
+    if (!m) return "<div>" + l.replace(/</g, "&lt;") + "</div>";
+    return '<div class="' + m[2] + '"><b>' + m[1] + '</b> [' + m[2] + '] ' + m[3].replace(/</g, "&lt;") + "</div>";
+  }).join("\n");
+  const prev = box.innerHTML;
+  box.innerHTML = html;
+  if (prev !== html) box.scrollTop = box.scrollHeight;
+}
+
+/* ==================== 扫描动作 ==================== */
+async function startScan() {
+  showTask("正在启动扫描…");
+  const r = await api("/api/scan", { method: "POST" });
+  if (!r.ok) { showTask("扫描启动失败：" + (r.error || ""), true); setTimeout(hideTask, 4000); return; }
+  pollTask("scan", async result => {
+    scanData = result;
+    renderScanList("green", "listGreen", "selAllGreen", "selInfoGreen", "btnCleanGreen", true);
+    renderScanList("yellow", "listYellow", "selAllYellow", "selInfoYellow", "btnCleanYellow", true);
+    renderScanList("red", "listRed", null, null, null, false);
+    renderStats();
+    showTask("✅ 扫描完成：发现 " + result.stats.total + " 项，共 " + result.stats.totalGB + " GB", false);
+    setTimeout(hideTask, 4000);
+  });
+}
+
+async function startResidue() {
+  showTask("正在启动卸载残留扫描…");
+  const r = await api("/api/residue", { method: "POST" });
+  if (!r.ok) { showTask("残留扫描启动失败：" + (r.error || ""), true); setTimeout(hideTask, 4000); return; }
+  pollTask("residue", result => {
+    residueData = result;
+    renderResidue();
+    renderStats();
+    showTask("✅ 残留扫描完成：发现 " + result.stats.total + " 项，共 " + result.stats.totalMB + " MB", false);
+    setTimeout(hideTask, 4000);
+  });
+}
+
+function cleanSelected(mode) {
+  const boxId = mode === "SafeClean" ? "listGreen" : "listYellow";
+  const cbs = document.querySelectorAll("#" + boxId + " input.chk:checked");
+  const paths = [...cbs].map(c => c.dataset.path);
+  if (!paths.length) return;
+  const names = paths.map(p => {
+    const it = (scanData.items || []).find(x => x.path === p);
+    return (it ? it.name + " — " : "") + p;
+  });
+  const warn = mode === "SafeClean"
+    ? "以下为 <b>绿色安全级别</b> 缓存，删除前会自动备份到 backups\\，不影响软件运行。"
+    : "以下为 <b>黄色确认级别</b> 项目（聊天记录/配置/数据等）。删除前会自动备份，但建议确认不再需要。删除后可在「备份恢复」页恢复。";
+  showModal(mode === "SafeClean" ? "确认清理（绿色）" : "确认清理（黄色）", warn, names, async () => {
+    showTask("正在清理…");
+    await api("/api/clean", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode, paths })
+    });
+    pollTask("clean", async result => {
+      const st = result.stats || {};
+      showTask("✅ 清理完成：成功 " + st.cleaned + " 项，跳过 " + st.skipped + " 项", false);
+      setTimeout(hideTask, 4000);
+      await startScan();
+    }, () => { });
+  });
+}
+
+function cleanResidue() {
+  const cbs = document.querySelectorAll("#listResidue input.chk:checked");
+  const residues = [...cbs].map(c => {
+    const it = (residueData.items || []).find(x => x.id === c.dataset.id);
+    return { id: it.id, type: it.type, path: it.path, name: it.name };
+  });
+  if (!residues.length) return;
+  const hasReg = residues.some(r => r.type === "registry");
+  const warn = (hasReg ? "<b>注意：包含注册表条目。</b>删除前会先导出 .reg 备份。注册表操作有风险，仅清理确认已卸载软件的条目。<br><br>" : "") +
+    "以下项目将在清理后从 C 盘移除：";
+  const names = residues.map(r => "[" + (TYPE_LABEL[r.type] || r.type) + "] " + r.name + " — " + r.path);
+  showModal("确认清理卸载残留", warn, names, async () => {
+    showTask("正在清理残留…");
+    await api("/api/clean", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "ResidueClean", residues })
+    });
+    pollTask("clean", async result => {
+      const st = result.stats || {};
+      showTask("✅ 残留清理完成：成功 " + st.cleaned + " 项，跳过 " + st.skipped + " 项", false);
+      setTimeout(hideTask, 4000);
+      residueData = null;
+      await startResidue();
+    }, () => { });
+  });
+}
+
+/* ==================== 模态框 ==================== */
+function showModal(title, warn, items, onOk) {
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalWarn").innerHTML = warn;
+  const ul = document.getElementById("modalList");
+  ul.innerHTML = "";
+  for (const it of items) {
+    const li = document.createElement("li");
+    const name = el("div", "mname", it.includes("—") ? it.split("—")[0].trim() : "项目");
+    const path = el("div", "mpath", it.includes("—") ? it.split("—").slice(1).join("—").trim() : it);
+    li.appendChild(name); li.appendChild(path);
+    ul.appendChild(li);
+  }
+  const backdrop = document.getElementById("modal-backdrop");
+  backdrop.classList.remove("hidden");
+  const ok = document.getElementById("modalOk");
+  const cancel = document.getElementById("modalCancel");
+  ok.onclick = () => { backdrop.classList.add("hidden"); onOk(); };
+  cancel.onclick = () => backdrop.classList.add("hidden");
+  backdrop.onclick = e => { if (e.target === backdrop) backdrop.classList.add("hidden"); };
+}
+
+/* ==================== 标签页 ==================== */
+function switchTab(name) {
+  activeTab = name;
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll("main section[id^=tab-]").forEach(s => {
+    s.classList.toggle("hidden", s.id !== "tab-" + name);
+  });
+  if (name === "backup") loadBackups();
+  if (name === "log") loadLogs();
+}
+
+/* ==================== 初始化 ==================== */
+document.getElementById("tabs").addEventListener("click", e => {
+  const t = e.target.closest(".tab");
+  if (t) switchTab(t.dataset.tab);
+});
+
+document.getElementById("btnScan").onclick = startScan;
+document.getElementById("btnScanResidue").onclick = startResidue;
+document.getElementById("btnResidue").onclick = () => { switchTab("residue"); startResidue(); };
+document.getElementById("btnCleanGreen").onclick = () => cleanSelected("SafeClean");
+document.getElementById("btnCleanYellow").onclick = () => cleanSelected("DeepClean");
+document.getElementById("btnCleanResidue").onclick = cleanResidue;
+document.getElementById("btnRefresh").onclick = loadDisk;
+document.getElementById("btnRefreshBackups").onclick = loadBackups;
+
+async function init() {
+  const st = await api("/api/status");
+  document.getElementById("ver").textContent = st.app + " v" + st.version;
+  if (st.isAdmin) document.getElementById("badgeAdmin").classList.remove("hidden");
+  else document.getElementById("badgeUser").classList.remove("hidden");
+  await loadDisk();
+  renderStats();
+  // 自动刷新
+  setInterval(() => {
+    if (document.getElementById("autoRefresh").checked && !activeTask) loadDisk();
+  }, 5000);
+  // 日志 tab 轮询
+  setInterval(() => { if (activeTab === "log") loadLogs(); }, 3000);
+  renderScanList("green", "listGreen", "selAllGreen", "selInfoGreen", "btnCleanGreen", true);
+  renderScanList("yellow", "listYellow", "selAllYellow", "selInfoYellow", "btnCleanYellow", true);
+  renderScanList("red", "listRed", null, null, null, false);
+  renderResidue();
+  loadBackups();
+  loadLogs();
+}
+init();
+</script>
+</body>
+</html>
